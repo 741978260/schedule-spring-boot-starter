@@ -1,0 +1,40 @@
+server:
+  port: 36000
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    rabbit:
+      enabled: false
+spring:
+  cloud:
+    stream:
+      bindings:
+        oneMinuteOutput:
+          destination: mmc.schedule
+        input:
+          destination: mmc.schedule
+          group: polling
+      rabbit:
+        bindings:
+          input.consumer:
+            exchangeType: direct
+            bindingRoutingKey: polling
+      binders:
+        rabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                addresses: 106.15.47.205:5672
+                username: guest
+                password: guest
+                virtual-host: /mmc-dev
+      default-binder: rabbit
+
+
