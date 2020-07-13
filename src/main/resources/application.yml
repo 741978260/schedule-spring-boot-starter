@@ -17,6 +17,9 @@ spring:
       bindings:
         oneMinuteOutput:
           destination: mmc.schedule
+        oneMinuteInput:
+          destination: mmc.schedule
+          group: one-minute
         input:
           destination: mmc.schedule
           group: polling
@@ -25,6 +28,17 @@ spring:
           input.consumer:
             exchangeType: direct
             bindingRoutingKey: polling
+          oneMinuteOutput.producer:
+            exchangeType: direct
+            routingKeyExpression: '''one-minute'''
+          oneMinuteInput.consumer:
+            autoBindDlq: true
+            ttl: 60000
+            exchangeType: direct
+            bindingRoutingKey: one-minute
+            deadLetterExchange: mmc.schedule
+            deadLetterQueueName: mmc.schedule.polling
+#            deadLetterRoutingKey:
       binders:
         rabbit:
           type: rabbit
