@@ -15,11 +15,14 @@ spring:
   cloud:
     stream:
       bindings:
-        oneMinuteOutput:
-          destination: mmc.schedule
+        oneMinuteOutput.destination: mmc.schedule
+        fiveMinutesOutput.destination: mmc.schedule
         oneMinuteInput:
           destination: mmc.schedule
           group: one-minute
+        fiveMinutesInput:
+          destination: mmc.schedule
+          group: five-minutes
         input:
           destination: mmc.schedule
           group: polling
@@ -31,6 +34,9 @@ spring:
           oneMinuteOutput.producer:
             exchangeType: direct
             routingKeyExpression: '''one-minute'''
+          fiveMinutesOutput.producer:
+            exchangeType: direct
+            routingKeyExpression: '''five-minutes'''
           oneMinuteInput.consumer:
             autoBindDlq: true
             ttl: 60000
@@ -38,7 +44,15 @@ spring:
             bindingRoutingKey: one-minute
             deadLetterExchange: mmc.schedule
             deadLetterQueueName: mmc.schedule.polling
-#            deadLetterRoutingKey:
+            deadLetterRoutingKey: polling
+          fiveMinutesInput.consumer:
+            autoBindDlq: true
+            ttl: 300000
+            exchangeType: direct
+            bindingRoutingKey: five-minutes
+            deadLetterExchange: mmc.schedule
+            deadLetterQueueName: mmc.schedule.polling
+            deadLetterRoutingKey: polling
       binders:
         rabbit:
           type: rabbit
